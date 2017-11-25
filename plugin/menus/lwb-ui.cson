@@ -15,6 +15,18 @@
         {
           'label': 'Toggle'
           'command': 'lwb-ui:toggle'
+        },
+        {
+        'label': 'Prop'
+        'command': 'lwb-ui:prop'
+        },
+        {
+        'label': 'Pred'
+        'command': 'lwb-ui:pred'
+        },
+        {
+        'label': 'Ltl'
+        'command': 'lwb-ui:ltl'
         }
       ]
     ]
