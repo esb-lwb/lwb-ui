@@ -15,3 +15,4 @@
 (def packages (.-packages js/atom))
 (def views (.-views js/atom))
 (def textEditors (.-textEditors js/atom))
+(def grammars (.-grammars js/atom))
