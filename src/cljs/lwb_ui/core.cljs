@@ -29,11 +29,31 @@
     (doseq [disposable @disposables]
       (.dispose disposable)))
 
+(defn reset-repl []
+  (let [editor (.getActiveTextEditor atom/workspace)
+        headLine (.lineTextForBufferRow editor 0)]
+        ;FIXME: check if line is (use ...lwb ...)
+        (.clearRepl js/protoRepl)
+        (.executeCode js/protoRepl headLine)
+  ))
+
+(def header {
+  :prop "(use 'lwb.prop)"
+  :pred "(use 'lwb.pred)"
+  :ltl  "(use 'lwb.ltl)"
+  })
+
 (defn start-lwb-ui []
   (.log js/console "repling")
   (reset! started? true)
-  (.onDidConnect js/protoRepl #(.clearRepl js/protoRepl))
-  (.toggle js/protoRepl))
+  (.onDidConnect js/protoRepl #(reset-repl))
+  (-> (.open atom/workspace)
+    (.then (fn [e] (.toggle js/protoRepl) e))
+    (.then (fn [editor]
+              (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
+              (.insertText editor (str (:prop header)))
+              (.activatePreviousPane atom/workspace)))
+    ))
 
 (defn stop-lwb-ui []
   (reset! started? false)
