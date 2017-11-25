@@ -10,6 +10,8 @@
 
 ;; Atom for holding all disposables objects
 (def disposables (atom []))
+;; are we started?
+(def started? (atom false))
 
 ;; Initialise new composite-disposable so we can add stuff to it later
 (def subscriptions (new composite-disposable))
@@ -17,15 +19,25 @@
 
 (defn toggle []
     (.log js/console "lwb-ui got toggled!")
-    ;FIXME: this is a simple test
-    (-> (.open atom/workspace)
-      (.then #(.insertText % "nico was here, haha!"))) )
+    (if @started?
+      (stop-lwb-ui)
+      (start-lwb-ui)))
 
 ;; Dispose all disposables
 (defn deactivate []
     (.log js/console "Deactivating lwb-ui...")
     (doseq [disposable @disposables]
       (.dispose disposable)))
+
+(defn start-lwb-ui []
+  (.log js/console "repling")
+  (reset! started? true)
+  (.onDidConnect js/protoRepl #(.clearRepl js/protoRepl))
+  (.toggle js/protoRepl))
+
+(defn stop-lwb-ui []
+  (reset! started? false)
+  (.quitRepl js/protoRepl))
 
 (defn serialize []
   nil)
