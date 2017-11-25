@@ -1,11 +1,9 @@
 (ns lwb-ui.core
-  (:require [cljs.nodejs :as node]))
+  (:require [cljs.nodejs :as node]
+            [lwb-ui.atom :as atom]))
 
 ;; reference to atom shell API
 (def ashell (node/require "atom"))
-
-;; js/atom is not the same as require 'atom'.
-(def commands (.-commands js/atom))
 
 ;; get atom.CompositeDisposable so we can work with it
 (def composite-disposable (.-CompositeDisposable ashell))
@@ -20,7 +18,7 @@
 (defn toggle []
     (.log js/console "lwb-ui got toggled!")
     ;FIXME: this is a simple test
-    (-> (.open (.-workspace js/atom))
+    (-> (.open atom/workspace)
       (.then #(.insertText % "nico was here, haha!"))) )
 
 ;; Dispose all disposables
@@ -35,7 +33,7 @@
 (defn activate [state]
   (.log js/console "Hello World from lwb-ui")
   (.add subscriptions
-        (.add commands "atom-workspace" "lwb-ui:toggle" toggle)))
+        (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)))
 
 ;; live-reload
 ;; calls stop before hotswapping code
