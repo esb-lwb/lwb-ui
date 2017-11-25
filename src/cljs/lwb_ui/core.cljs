@@ -75,8 +75,8 @@
   (reset! started? true)
   (.onDidConnect js/protoRepl
     (fn []
-      (reset-repl)))
-      ;(.addInfo "lwb-repl ready" atom/notifications))) ;FIXME: fix it
+      (reset-repl)
+      (.addSuccess atom/notifications "lwb-repl ready")))
   (-> (.open atom/workspace)
     (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
     (.then (fn [editor]
