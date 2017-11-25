@@ -29,6 +29,9 @@
     (doseq [disposable @disposables]
       (.dispose disposable)))
 
+(def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
+(def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
+
 (defn reset-repl []
   (let [editor (.getActiveTextEditor atom/workspace)
         headLine (.lineTextForBufferRow editor 0)]
@@ -46,9 +49,12 @@
 (defn start-lwb-ui []
   (.log js/console "repling")
   (reset! started? true)
-  (.onDidConnect js/protoRepl #(reset-repl))
+  (.onDidConnect js/protoRepl
+    (fn []
+      (reset-repl)))
+      ;(.addInfo "lwb-repl ready" atom/notifications)))
   (-> (.open atom/workspace)
-    (.then (fn [e] (.toggle js/protoRepl) e))
+    (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
     (.then (fn [editor]
               (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
               (.insertText editor (str (:prop header)))

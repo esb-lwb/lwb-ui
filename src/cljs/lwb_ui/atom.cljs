@@ -1,5 +1,9 @@
 (ns lwb-ui.atom
-  "Contains references to the 'atom' global object.")
+  "Contains references to the 'atom' global object."
+  (:require [cljs.nodejs :as node]))
+
+;; reference to atom shell API
+(def ashell (node/require "atom"))
 
 ;; js/atom is not the same as require 'atom'.
 (def commands (.-commands js/atom))
@@ -16,3 +20,4 @@
 (def views (.-views js/atom))
 (def textEditors (.-textEditors js/atom))
 (def grammars (.-grammars js/atom))
+(def directory (.-Directory ashell))
