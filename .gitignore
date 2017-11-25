@@ -4,7 +4,7 @@ pom.xml
 /plugin/lib
 /classes/
 /out/
-/target/
+target/
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/

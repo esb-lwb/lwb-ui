@@ -4,5 +4,6 @@
                  [proto-repl-charts "0.3.1"]
                  [proto-repl "0.3.1"]]
 
+  :resource-paths ["lib/lwb.jar"]
   :profiles
   {:dev {:source-paths ["dev" "src"]}})
