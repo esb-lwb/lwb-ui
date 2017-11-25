@@ -40,10 +40,11 @@
         (.executeCode js/protoRepl headLine)
   ))
 
+
 (def header {
-  :prop "(use 'lwb.prop)"
-  :pred "(use 'lwb.pred)"
-  :ltl  "(use 'lwb.ltl)"
+             :prop "(ns prop (:require [lwb.prop :refer :all]))"
+             :pred "(ns pred (:require [lwb.pred :refer :all]))"
+             :ltl  "(ns ltl (:require [lwb.ltl :refer :all]))"
   })
 
 (defn start-lwb-ui []
