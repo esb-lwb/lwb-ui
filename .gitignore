@@ -1,7 +1,7 @@
 /resources/public/js/compiled/**
 pom.xml
 *jar
-plugin/lib
+/plugin/lib
 /classes/
 /out/
 /target/
@@ -20,3 +20,5 @@ plugin/lib
 
 *.DS_Store
 node_modules/
+
+!lwb.jar
