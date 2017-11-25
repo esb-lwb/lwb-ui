@@ -13,6 +13,8 @@
     "atom-package-deps": "^4.6.0"
   },
   "package-deps": [
-    "proto-repl"
+    "proto-repl",
+    "language-clojure",
+    "ink"
   ]
 }
