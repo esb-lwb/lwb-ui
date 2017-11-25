@@ -3,13 +3,16 @@
   "main": "./lib/lwb-ui",
   "version": "0.0.0",
   "description": "",
-  "keywords": [
-  ],
+  "keywords": [],
   "repository": "",
   "license": "",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-  }
+    "atom-package-deps": "^4.6.0"
+  },
+  "package-deps": [
+    "proto-repl"
+  ]
 }

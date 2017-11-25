@@ -30,10 +30,16 @@
 (defn serialize []
   nil)
 
+(defn install-dependent-packages []
+  (.install (node/require "atom-package-deps") "lwb-ui"))
+
 (defn activate [state]
   (.log js/console "Hello World from lwb-ui")
-  (.add subscriptions
-        (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)))
+  (-> (install-dependent-packages)
+      (.then #(pck-commands))))
+
+(defn pck-commands []
+  (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle))
 
 ;; live-reload
 ;; calls stop before hotswapping code
