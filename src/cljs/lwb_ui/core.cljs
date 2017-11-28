@@ -49,10 +49,11 @@
              :prop "(ns prop (:require [lwb.prop :refer :all]))"
              :pred "(ns pred (:require [lwb.pred :refer :all]))"
              :ltl  "(ns ltl (:require [lwb.ltl :refer :all]))"
+             :nd   "(ns nd (:require [lwb.nd.repl :refer :all]))"
              })
 
 ;;matches any namespace of 'header' containing lwb.*
-(def ns-regex #"\(ns \w+ \(:require \[lwb\.\w+ :refer :all\]\)\)")
+(def ns-regex #"\(ns \w+ \(:require \[lwb\.[\w\.]+ :refer :all\]\)\)")
 
 (defn switch-namespace [namespace]
   (let [editor (.getActiveTextEditor atom/workspace)]
@@ -69,6 +70,9 @@
 (defn use-ltl []
   (.log js/console "Hello World from ltl")
   (switch-namespace (:ltl header)))
+(defn use-nd []
+  (.log js/console "Hello World from nd")
+  (switch-namespace (:nd header)))
 
 
 (defn start-lwb-ui []
@@ -107,6 +111,7 @@
   (.add atom/commands "atom-workspace" "lwb-ui:prop" use-prop)
   (.add atom/commands "atom-workspace" "lwb-ui:pred" use-pred)
   (.add atom/commands "atom-workspace" "lwb-ui:ltl" use-ltl)
+  (.add atom/commands "atom-workspace" "lwb-ui:nd" use-nd)
 )
 
 ;; live-reload
