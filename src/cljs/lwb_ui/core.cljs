@@ -28,19 +28,15 @@
 (def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
 (def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
 
-(defn reset-repl []
-  (let [editor (.getActiveTextEditor atom/workspace)
-        headLine (.lineTextForBufferRow editor 0)]
-        ;FIXME: check if line is (use ...lwb ...)
-        (.clearRepl js/protoRepl)
-        (.executeCode js/protoRepl headLine)
-  ))
-
-(defn add-header [editor namespace]
-  (.setGrammar editor atom/clojure-grammar)
-  (let [buffer (.getBuffer editor)]
-    (.insert buffer 0 "\n\n")
-    (.insert buffer 0 (str namespace))))
+(defn reset-repl
+  ([]
+    (let [editor (.getActiveTextEditor atom/workspace)]
+      (reset-repl editor)))
+  ([editor]
+    (let [headLine (.lineTextForBufferRow editor 0)]
+      ;FIXME: check if line is (use ...lwb ...)
+      (.clearRepl js/protoRepl)
+      (.executeCode js/protoRepl headLine))))
 
 (def header {
              :prop '(ns prop
@@ -65,20 +61,33 @@
                       (:require [lwb.nd.repl :refer :all]))
              })
 
+(defn add-header [editor namespace]
+  (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
+  (let [buffer (.getBuffer editor)]
+    (.insert buffer 0 "\n\n")
+    (.insert buffer 0 namespace)))
+
+
 ;;matches any namespace of 'header' containing lwb.*
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
-(defn switch-namespace [namespace]
-  (if @started?
+;;FIXME: nico schau dir das mal an, sobald ich die funktion wegwerfe und den inhalt direkt in die if schreibe, hab ich beim wechsel vom ns keinen editor
+(defn switch-namespace-test [editor namespace]
+  (reset! replaced? false)
+  (.scan editor ns-regex (fn [match]
+    (reset! replaced? true)
+    (.replace match (str namespace))))
+  (if-not @replaced? (add-header editor (str namespace)))
+  (reset-repl editor))
+
+(defn switch-namespace
+  ([namespace]
     (let [editor (.getActiveTextEditor atom/workspace)]
-      (reset! replaced? false)
-      (.scan editor ns-regex (fn [match]
-        (reset! replaced? true)
-        (.replace match (str namespace))))
-      (if-not @replaced?
-        (add-header editor namespace))
-      (reset-repl))
-      (atom/error-notify "Logic Workbench not running.")))
+      (switch-namespace editor namespace)))
+  ([editor namespace]
+    (if @started?
+      (switch-namespace-test editor namespace)
+      (atom/error-notify "Logic Workbench not running."))))
 
 
 (defn use-prop []
@@ -97,15 +106,20 @@
 
 (defn start-lwb-ui []
   (reset! started? true)
-  (.onDidConnect js/protoRepl
-    (fn []
-      (reset-repl)
-      (atom/success-notify "Logic Workbench REPL ready")))
-  (-> (.open atom/workspace) ;;TODO: only open if no matching file open
-    (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
+  (->
+    (.open atom/workspace) ;;TODO: function that returns matching editor OR a new ;)
     (.then (fn [editor]
-             (add-header editor (:prop header))
-             (.activatePreviousPane atom/workspace)))
+      (.onDidConnect js/protoRepl
+        (fn []
+          (reset-repl editor)
+          (atom/success-notify "Logic Workbench REPL ready")))
+          editor))
+    (.then (fn [editor]
+      (.toggle js/protoRepl (.getPath repl-project-root))
+      editor))
+    (.then (fn [editor]
+      (switch-namespace editor (:prop header))
+      (.activatePreviousPane atom/workspace)))
     ))
 
 (defn stop-lwb-ui []
@@ -119,7 +133,7 @@
   (.install (node/require "atom-package-deps") "lwb-ui"))
 
 (defn toggle []
-    (.log js/console "lwb-ui got toggled!")
+    (.log js/console "lwb-ui was: " @started?)
     (if @started?
       (stop-lwb-ui)
       (start-lwb-ui)))
