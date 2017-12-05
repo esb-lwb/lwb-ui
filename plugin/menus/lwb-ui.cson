@@ -17,20 +17,20 @@
           'command': 'lwb-ui:toggle'
         },
         {
-        'label': 'Prop'
-        'command': 'lwb-ui:prop'
+        'label': 'Propositonal Logic'
+        'command': 'lwb-ui:propositonal-logic'
         },
         {
-        'label': 'Pred'
-        'command': 'lwb-ui:pred'
+        'label': 'Predicate Logic'
+        'command': 'lwb-ui:predicate-logic'
         },
         {
-        'label': 'Ltl'
-        'command': 'lwb-ui:ltl'
+        'label': 'Linear Temporal Logic'
+        'command': 'lwb-ui:linear-temporal-logic'
         },
         {
-        'label': 'ND'
-        'command': 'lwb-ui:nd'
+        'label': 'Natural Deduction'
+        'command': 'lwb-ui:natural-deduction'
         }
       ]
     ]
