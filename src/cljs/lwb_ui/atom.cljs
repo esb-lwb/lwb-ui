@@ -21,3 +21,6 @@
 (def textEditors (.-textEditors js/atom))
 (def grammars (.-grammars js/atom))
 (def directory (.-Directory ashell))
+
+(defn error-notify [text] (.addError notifications text))
+(defn success-notify [text] (.addSuccess notifications text))

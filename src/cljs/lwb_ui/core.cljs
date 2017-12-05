@@ -19,7 +19,6 @@
 ;; have we replaced the header?
 (def replaced? (atom false))
 
-
 ;; Initialise new composite-disposable so we can add stuff to it later
 (def subscriptions (new composite-disposable))
 (swap! disposables conj subscriptions)
@@ -42,25 +41,27 @@
     (.insert buffer 0 namespace)))
 
 (def header {
-             :prop "(ns prop (:require [lwb.prop :refer :all]))"
-             :pred "(ns pred (:require [lwb.pred :refer :all]))"
-             :ltl  "(ns ltl (:require [lwb.ltl :refer :all]))"
+             :prop "(ns prop (:require [lwb.prop :refer :all] [lwb.prop.sat :refer :all]))"
+             :pred "(ns pred (:require [lwb.pred :refer :all] [lwb.pred.sat :refer :all] [lwb.pred.substitution :refer :all]))"
+             :ltl  "(ns ltl (:require [lwb.ltl :refer :all] [lwb.ltl.eval :refer :all] [lwb.ltl.buechi :refer :all] [lwb.ltl.sat :refer :all]))"
              :nd   "(ns nd (:require [lwb.nd.repl :refer :all]))"
              })
 
 ;;matches any namespace of 'header' containing lwb.*
-(def ns-regex #"\(ns \w+ \(:require \[lwb\.[\w\.]+ :refer :all\]\)\)")
+(def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
 (defn switch-namespace [namespace]
-  (let [editor (.getActiveTextEditor atom/workspace)]
-    (reset! replaced? false)
-    (.scan editor ns-regex (fn [match]
-      (reset! replaced? true)
-      (.replace match namespace)))
-    (if-not @replaced?
-      (add-header editor namespace))
-    (reset-repl)
-    ))
+  (if @started?
+    (let [editor (.getActiveTextEditor atom/workspace)]
+      (reset! replaced? false)
+      (.scan editor ns-regex (fn [match]
+        (reset! replaced? true)
+        (.replace match namespace)))
+      (if-not @replaced?
+        (add-header editor namespace))
+      (reset-repl))
+      (atom/error-notify "Logic Workbench not running.")))
+
 
 (defn use-prop []
   (.log js/console "Hello World from prop")
@@ -81,8 +82,8 @@
   (.onDidConnect js/protoRepl
     (fn []
       (reset-repl)
-      (.addSuccess atom/notifications "lwb-repl ready")))
-  (-> (.open atom/workspace)
+      (atom/success-notify "Logic Workbench REPL ready")))
+  (-> (.open atom/workspace) ;;TODO: only open if no matching file open
     (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
     (.then (fn [editor]
              (add-header editor (str (:prop header)))
