@@ -30,6 +30,7 @@ lein run -m build/release
 
 After you have done that, go into the `plugin/` folder and run
 ```
+apm install
 apm link
 ```
 

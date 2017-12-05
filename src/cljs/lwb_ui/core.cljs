@@ -107,10 +107,10 @@
 
 (defn pck-commands []
   (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)
-  (.add atom/commands "atom-workspace" "lwb-ui:prop" use-prop)
-  (.add atom/commands "atom-workspace" "lwb-ui:pred" use-pred)
-  (.add atom/commands "atom-workspace" "lwb-ui:ltl" use-ltl)
-  (.add atom/commands "atom-workspace" "lwb-ui:nd" use-nd)
+  (.add atom/commands "atom-workspace" "lwb-ui:propositonal-logic" use-prop)
+  (.add atom/commands "atom-workspace" "lwb-ui:predicate-logic" use-pred)
+  (.add atom/commands "atom-workspace" "lwb-ui:linear-temporal-logic" use-ltl)
+  (.add atom/commands "atom-workspace" "lwb-ui:natural-deduction" use-nd)
 )
 
 ;; Dispose all disposables
