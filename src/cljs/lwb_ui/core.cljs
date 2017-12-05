@@ -6,6 +6,7 @@
 ;; - require needed sub packages
 ;; - add shortcuts for logics to clj scope
 ;; - fix generated uberjar to include sat solvers
+;; - enable user to view the examples: print the code into a new buffer
 
 ;; reference to atom shell API
 (def ashell (node/require "atom"))
@@ -42,10 +43,20 @@
     (.insert buffer 0 namespace)))
 
 (def header {
-             :prop "(ns prop (:require [lwb.prop :refer :all] [lwb.prop.sat :refer :all]))"
-             :pred "(ns pred (:require [lwb.pred :refer :all] [lwb.pred.sat :refer :all] [lwb.pred.substitution :refer :all]))"
-             :ltl  "(ns ltl (:require [lwb.ltl :refer :all] [lwb.ltl.eval :refer :all] [lwb.ltl.buechi :refer :all] [lwb.ltl.sat :refer :all]))"
-             :nd   "(ns nd (:require [lwb.nd.repl :refer :all]))"
+             :prop '(ns prop
+                      (:require [lwb.prop :refer :all]
+                                [lwb.prop.sat :refer :all]))
+             :pred '(ns pred
+                      (:require [lwb.pred :refer :all]
+                                [lwb.pred.sat :refer :all]
+                                [lwb.pred.substitution :refer :all]))
+             :ltl  '(ns ltl
+                      (:require [lwb.ltl :refer :all]
+                                [lwb.ltl.eval :refer :all]
+                                [lwb.ltl.buechi :refer :all]
+                                [lwb.ltl.sat :refer :all]))
+             :nd   '(ns nd
+                      (:require [lwb.nd.repl :refer :all]))
              })
 
 ;;matches any namespace of 'header' containing lwb.*
@@ -59,7 +70,7 @@
         (reset! replaced? true)
         (.replace match namespace)))
       (if-not @replaced?
-        (add-header editor namespace))
+        (add-header editor (str namespace)))
       (reset-repl))
       (atom/error-notify "Logic Workbench not running.")))
 
