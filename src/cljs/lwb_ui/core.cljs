@@ -16,22 +16,13 @@
 (def disposables (atom []))
 ;; are we started?
 (def started? (atom false))
+;; have we replaced the header?
+(def replaced? (atom false))
+
 
 ;; Initialise new composite-disposable so we can add stuff to it later
 (def subscriptions (new composite-disposable))
 (swap! disposables conj subscriptions)
-
-(defn toggle []
-    (.log js/console "lwb-ui got toggled!")
-    (if @started?
-      (stop-lwb-ui)
-      (start-lwb-ui)))
-
-;; Dispose all disposables
-(defn deactivate []
-    (.log js/console "Deactivating lwb-ui...")
-    (doseq [disposable @disposables]
-      (.dispose disposable)))
 
 (def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
 (def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
@@ -44,6 +35,11 @@
         (.executeCode js/protoRepl headLine)
   ))
 
+(defn add-header [editor namespace]
+  (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
+  (let [buffer (.getBuffer editor)]
+    (.insert buffer 0 "\n\n")
+    (.insert buffer 0 namespace)))
 
 (def header {
              :prop "(ns prop (:require [lwb.prop :refer :all]))"
@@ -57,7 +53,12 @@
 
 (defn switch-namespace [namespace]
   (let [editor (.getActiveTextEditor atom/workspace)]
-    (.scan editor ns-regex (fn [match] (.replace match namespace)))
+    (reset! replaced? false)
+    (.scan editor ns-regex (fn [match]
+      (reset! replaced? true)
+      (.replace match namespace)))
+    (if-not @replaced?
+      (add-header editor namespace))
     (reset-repl)
     ))
 
@@ -84,10 +85,7 @@
   (-> (.open atom/workspace)
     (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
     (.then (fn [editor]
-             (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
-             (.insertText editor (str (:prop header)))
-             (.insertNewline editor)
-             (.insertNewline editor)
+             (add-header editor (str (:prop header)))
              (.activatePreviousPane atom/workspace)))
     ))
 
@@ -101,10 +99,11 @@
 (defn install-dependent-packages []
   (.install (node/require "atom-package-deps") "lwb-ui"))
 
-(defn activate [state]
-  (.log js/console "Hello World from lwb-ui")
-  (-> (install-dependent-packages)
-      (.then #(pck-commands))))
+(defn toggle []
+    (.log js/console "lwb-ui got toggled!")
+    (if @started?
+      (stop-lwb-ui)
+      (start-lwb-ui)))
 
 (defn pck-commands []
   (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)
@@ -113,6 +112,17 @@
   (.add atom/commands "atom-workspace" "lwb-ui:ltl" use-ltl)
   (.add atom/commands "atom-workspace" "lwb-ui:nd" use-nd)
 )
+
+;; Dispose all disposables
+(defn deactivate []
+    (.log js/console "Deactivating lwb-ui...")
+    (doseq [disposable @disposables]
+      (.dispose disposable)))
+
+(defn activate [state]
+  (.log js/console "Hello World from lwb-ui")
+  (-> (install-dependent-packages)
+      (.then #(pck-commands))))
 
 ;; live-reload
 ;; calls stop before hotswapping code
