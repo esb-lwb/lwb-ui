@@ -3,8 +3,9 @@
             [lwb-ui.atom :as atom]))
 
 ;;TODO:
-;; - buttons for switching logic
-;; - natural deduction?
+;; - require needed sub packages
+;; - add shortcuts for logics to clj scope
+;; - fix generated uberjar to include sat solvers
 
 ;; reference to atom shell API
 (def ashell (node/require "atom"))
