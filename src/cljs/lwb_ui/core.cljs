@@ -37,7 +37,7 @@
   ))
 
 (defn add-header [editor namespace]
-  (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
+  (.setGrammar editor atom/clojure-grammar)
   (let [buffer (.getBuffer editor)]
     (.insert buffer 0 "\n\n")
     (.insert buffer 0 namespace)))

@@ -21,6 +21,7 @@
 (def textEditors (.-textEditors js/atom))
 (def grammars (.-grammars js/atom))
 (def directory (.-Directory ashell))
+(def clojure-grammar (.grammarForScopeName atom/grammars "source.clojure"))
 
 (defn error-notify [text] (.addError notifications text))
 (defn success-notify [text] (.addSuccess notifications text))
