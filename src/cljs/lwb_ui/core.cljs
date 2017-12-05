@@ -40,7 +40,7 @@
   (.setGrammar editor atom/clojure-grammar)
   (let [buffer (.getBuffer editor)]
     (.insert buffer 0 "\n\n")
-    (.insert buffer 0 namespace)))
+    (.insert buffer 0 (str namespace))))
 
 (def header {
              :prop '(ns prop
@@ -74,9 +74,9 @@
       (reset! replaced? false)
       (.scan editor ns-regex (fn [match]
         (reset! replaced? true)
-        (.replace match namespace)))
+        (.replace match (str namespace))))
       (if-not @replaced?
-        (add-header editor (str namespace)))
+        (add-header editor namespace))
       (reset-repl))
       (atom/error-notify "Logic Workbench not running.")))
 
@@ -104,7 +104,7 @@
   (-> (.open atom/workspace) ;;TODO: only open if no matching file open
     (.then (fn [e] (.toggle js/protoRepl (.getPath repl-project-root)) e))
     (.then (fn [editor]
-             (add-header editor (str (:prop header)))
+             (add-header editor (:prop header))
              (.activatePreviousPane atom/workspace)))
     ))
 
