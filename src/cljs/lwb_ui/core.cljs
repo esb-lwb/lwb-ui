@@ -71,23 +71,20 @@
 ;;matches any namespace of 'header' containing lwb.*
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
-;;FIXME: nico schau dir das mal an, sobald ich die funktion wegwerfe und den inhalt direkt in die if schreibe, hab ich beim wechsel vom ns keinen editor
-(defn switch-namespace-test [editor namespace]
-  (reset! replaced? false)
-  (.scan editor ns-regex (fn [match]
-    (reset! replaced? true)
-    (.replace match (str namespace))))
-  (if-not @replaced? (add-header editor (str namespace)))
-  (reset-repl editor))
-
 (defn switch-namespace
   ([namespace]
     (let [editor (.getActiveTextEditor atom/workspace)]
       (switch-namespace editor namespace)))
   ([editor namespace]
-    (if @started?
-      (switch-namespace-test editor namespace)
-      (atom/error-notify "Logic Workbench not running."))))
+   (if @started?
+     (do
+       (reset! replaced? false)
+       (.scan editor ns-regex (fn [match]
+                                (reset! replaced? true)
+                                (.replace match (str namespace))))
+       (if-not @replaced? (add-header editor (str namespace)))
+       (reset-repl editor))
+     (atom/error-notify "Logic Workbench not running."))))
 
 
 (defn use-prop []
