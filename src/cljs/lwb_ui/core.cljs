@@ -3,8 +3,7 @@
             [lwb-ui.atom :as atom]))
 
 ;;TODO:
-;; - require needed sub packages
-;; - add shortcuts for logics to clj scope
+;; - notify user which logic is used after switch
 ;; - fix generated uberjar to include sat solvers
 ;; - enable user to view the examples: print the code into a new buffer
 
@@ -18,8 +17,6 @@
 (def disposables (atom []))
 ;; are we started?
 (def started? (atom false))
-;; have we replaced the header?
-(def replaced? (atom false))
 
 ;; Initialise new composite-disposable so we can add stuff to it later
 (def subscriptions (new composite-disposable))
@@ -77,12 +74,14 @@
       (switch-namespace editor namespace)))
   ([editor namespace]
    (if @started?
-     (do
-       (reset! replaced? false)
+     (let [replaced? (atom false)]
+       ;;search for (ns .. ) definitions and replace them with the given ns
        (.scan editor ns-regex (fn [match]
                                 (reset! replaced? true)
                                 (.replace match (str namespace))))
-       (if-not @replaced? (add-header editor (str namespace)))
+       ;;if no (ns ..) replaced; add the header to the file; finally restart repl
+       (when-not @replaced?
+         (add-header editor (str namespace)))
        (reset-repl editor))
      (atom/error-notify "Logic Workbench not running."))))
 
