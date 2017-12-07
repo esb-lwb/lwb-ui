@@ -100,13 +100,15 @@
   (switch-namespace (:nd header)))
 
 (defn get-editor []
-  (let [replaced? (atom false)
-        editor (.getActiveTextEditor atom/workspace)]
-    (.scan editor ns-regex (fn [match]
-      (reset! replaced? true)))
-    (if (or @replaced? (clojure.string/blank? (.getText editor)))
-      (.resolve js/Promise editor)
-      (.open atom/workspace))))
+  (if-let [editor (.getActiveTextEditor atom/workspace)]
+    (let [replaced? (atom false)]
+      (.scan editor ns-regex #(reset! replaced? true))
+      (if (or @replaced? (clojure.string/blank? (.getText editor)))
+        (.resolve js/Promise editor)
+        (.open atom/workspace)))
+    (.open atom/workspace)
+    )
+  )
 
 (defn start-lwb-ui []
   (reset! started? true)
