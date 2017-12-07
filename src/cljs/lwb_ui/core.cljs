@@ -1,6 +1,7 @@
 (ns lwb-ui.core
   (:require [cljs.nodejs :as node]
-            [lwb-ui.atom :as atom]))
+            [lwb-ui.atom :as atom]
+            [clojure.string :as s]))
 
 ;;TODO:
 ;; - notify user which logic is used after switch
@@ -67,10 +68,20 @@
 ;;matches any namespace of 'header' containing lwb.*
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
+(defn get-editor []
+  (if-let [editor (.getActiveTextEditor atom/workspace)]
+    (let [replaced? (atom false)]
+      (.scan editor ns-regex #(reset! replaced? true))
+      (if (or @replaced? (s/blank? (.getText editor)))
+        (.resolve js/Promise editor)
+        (.open atom/workspace)))
+    (.open atom/workspace)
+    )
+  )
+
 (defn switch-namespace
   ([namespace]
-    (let [editor (.getActiveTextEditor atom/workspace)]
-      (switch-namespace editor namespace)))
+   (switch-namespace (get-editor) namespace))
   ([editor namespace]
    (if @started?
      (let [replaced? (atom false)]
@@ -98,17 +109,6 @@
 (defn use-nd []
   (.log js/console "Hello World from nd")
   (switch-namespace (:nd header)))
-
-(defn get-editor []
-  (if-let [editor (.getActiveTextEditor atom/workspace)]
-    (let [replaced? (atom false)]
-      (.scan editor ns-regex #(reset! replaced? true))
-      (if (or @replaced? (clojure.string/blank? (.getText editor)))
-        (.resolve js/Promise editor)
-        (.open atom/workspace)))
-    (.open atom/workspace)
-    )
-  )
 
 (defn start-lwb-ui []
   (reset! started? true)
