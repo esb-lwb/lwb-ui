@@ -30,8 +30,8 @@
     (let [headLine (.lineTextForBufferRow editor 0)]
       ;FIXME: check if line is (use ...lwb ...)
       (.clearRepl js/protoRepl)
-      (.executeCode js/protoRepl headLine)
-      (atom/success-notify (str "Logic Workbench REPL for ready")))) ; TODO detect name of namespace
+      (.executeCode js/protoRepl headLine)))
+
 
 (def header {
              :prop '(ns prop
@@ -77,11 +77,10 @@
     (.open atom/workspace)))
 
 (defn switch-namespace
-  ([namespace]
-   (.log js/console namespace)
+  ([namespace logic-name]
    (-> (get-editor)
-       (.then #(switch-namespace %1 namespace))))
-  ([editor namespace]
+       (.then #(switch-namespace %1 namespace logic-name))))
+  ([editor namespace logic-name]
    (if @started?
      (let [replaced? (atom false)]
        (.log js/console editor)
@@ -93,23 +92,23 @@
        ;;if no (ns ..) replaced; add the header to the file; finally restart repl
        (when-not @replaced?
          (add-header editor (str namespace)))
-       (reset-repl editor))
+       (reset-repl editor)
+       (atom/success-notify (str "Using " logic-name))) ; TODO detect name of namespace)
      (atom/error-notify "Logic Workbench not running."))))
 
 
 (defn use-prop []
-  (switch-namespace (:prop header)))
+  (switch-namespace (:prop header) "Propositional Logic"))
 (defn use-pred []
-  (switch-namespace (:pred header)))
+  (switch-namespace (:pred header) "Predicate Logic"))
 (defn use-ltl []
-  (switch-namespace (:ltl header)))
+  (switch-namespace (:ltl header) "Linear Temporal Logic"))
 (defn use-nd []
-  (switch-namespace (:nd header)))
+  (switch-namespace (:nd header) "Natural Deduction"))
 
 (defn start-lwb-ui []
   (reset! started? true)
-  (->
-    (get-editor)
+  (-> (get-editor)
     (.then (fn [editor]
       (.onDidConnect js/protoRepl
         (fn []
@@ -119,9 +118,9 @@
       (.toggle js/protoRepl (.getPath repl-project-root))
       editor))
     (.then (fn [editor]
-      (.log js/console editor)
-      (switch-namespace editor (:prop header))
-      (.activatePreviousPane atom/workspace)))
+             (switch-namespace editor (:prop header) "Propositional Logic")
+             (.activatePreviousPane atom/workspace)
+             (atom/success-notify "Logic Workbench ready!")))
     ))
 
 (defn stop-lwb-ui []
