@@ -25,15 +25,12 @@
 (def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
 (def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
 
-(defn reset-repl
-  ([]
-    (let [editor (.getActiveTextEditor atom/workspace)]
-      (reset-repl editor)))
-  ([editor]
+(defn reset-repl [editor]
     (let [headLine (.lineTextForBufferRow editor 0)]
       ;FIXME: check if line is (use ...lwb ...)
       (.clearRepl js/protoRepl)
-      (.executeCode js/protoRepl headLine))))
+      (.executeCode js/protoRepl headLine)
+      (atom/success-notify (str "Logic Workbench REPL for " name " ready")))) ; TODO detect name of namespace
 
 (def header {
              :prop '(ns prop
@@ -67,11 +64,7 @@
 ;;matches any namespace of 'header' containing lwb.*
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
-(defn switch-namespace
-  ([namespace]
-    (let [editor (.getActiveTextEditor atom/workspace)]
-      (switch-namespace editor namespace)))
-  ([editor namespace]
+(defn switch-namespace [editor namespace]
    (if @started?
      (let [replaced? (atom false)]
        ;;search for (ns .. ) definitions and replace them with the given ns
@@ -83,21 +76,25 @@
        (when-not @replaced?
          (add-header editor (str namespace)))
        (reset-repl editor))
-     (atom/error-notify "Logic Workbench not running."))))
+     (atom/error-notify "Logic Workbench not running.")))
 
+
+(defn use-namespace
+  ([namespace]
+    (let [editor (.getActiveTextEditor atom/workspace)]
+      (use-namespace editor namespace)))
+  ([editor namespace]
+    (.log js/console (str "Hello World from "))
+    (switch-namespace editor namespace)))
 
 (defn use-prop []
-  (.log js/console "Hello World from prop")
-  (switch-namespace (:prop header)))
+  (use-namespace (:prop header)))
 (defn use-pred []
-  (.log js/console "Hello World from pred")
-  (switch-namespace (:pred header)))
+  (use-namespace (:pred header)))
 (defn use-ltl []
-  (.log js/console "Hello World from ltl")
-  (switch-namespace (:ltl header)))
+  (use-namespace (:ltl header)))
 (defn use-nd []
-  (.log js/console "Hello World from nd")
-  (switch-namespace (:nd header)))
+  (use-namespace (:nd header)))
 
 (defn get-editor []
   (let [replaced? (atom false)
@@ -115,14 +112,14 @@
     (.then (fn [editor]
       (.onDidConnect js/protoRepl
         (fn []
-          (reset-repl editor)
-          (atom/success-notify "Logic Workbench REPL ready")))
+          (reset-repl editor)))
           editor))
     (.then (fn [editor]
       (.toggle js/protoRepl (.getPath repl-project-root))
       editor))
     (.then (fn [editor]
-      (switch-namespace editor (:prop header))
+      (.log js/console editor)
+      (use-namespace editor (:prop header))
       (.activatePreviousPane atom/workspace)))
     ))
 
