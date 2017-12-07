@@ -24,3 +24,7 @@
 
 (defn error-notify [text] (.addError notifications text))
 (defn success-notify [text] (.addSuccess notifications text))
+(defn info-notify [text] (.addInfo notifications text))
+
+(defn set-grammar [editor]
+  (.setGrammar editor (.grammarForScopeName grammars "source.clojure")))

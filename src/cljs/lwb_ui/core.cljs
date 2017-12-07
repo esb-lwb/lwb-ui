@@ -4,7 +4,6 @@
             [clojure.string :as s]))
 
 ;;TODO:
-;; - notify user which logic is used after switch
 ;; - fix generated uberjar to include sat solvers
 ;; - enable user to view the examples: print the code into a new buffer
 
@@ -25,13 +24,6 @@
 
 (def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
 (def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
-
-(defn reset-repl [editor]
-    (let [headLine (.lineTextForBufferRow editor 0)]
-      ;FIXME: check if line is (use ...lwb ...)
-      (.clearRepl js/protoRepl)
-      (.executeCode js/protoRepl headLine)))
-
 
 (def header {
              :prop '(ns prop
@@ -56,15 +48,20 @@
                       (:require [lwb.nd.repl :refer :all]))
              })
 
+;;matches any namespace of 'header' containing lwb.*
+(def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
+
+
+(defn reset-repl [editor]
+  (atom/set-grammar editor)
+  (.scan editor ns-regex (fn [match]
+    (.clearRepl js/protoRepl)
+    (.executeCode js/protoRepl match.matchText))))
+
 (defn add-header [editor namespace]
   (let [buffer (.getBuffer editor)]
     (.insert buffer 0 "\n\n")
     (.insert buffer 0 namespace)))
-
-
-;;matches any namespace of 'header' containing lwb.*
-(def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
-
 
 (defn get-editor []
   "Returns a promise of the current active TextEditor that contains our lwb code. If no matching TextEditor is found, create one."
@@ -79,23 +76,27 @@
 (defn switch-namespace
   ([namespace logic-name]
    (-> (get-editor)
-       (.then #(switch-namespace %1 namespace logic-name))))
+       (.then (fn [editor]
+         (switch-namespace editor namespace logic-name)
+         (atom/set-grammar editor)
+         editor))
+       (.then (fn [editor]
+         (reset-repl editor)
+         (atom/success-notify (str "Using " logic-name))))
+       (.catch (fn [e]
+         (.log js/console e)
+         (atom/error-notify "Logic Workbench not running.")))))
   ([editor namespace logic-name]
    (if @started?
      (let [replaced? (atom false)]
-       (.log js/console editor)
        ;;search for (ns .. ) definitions and replace them with the given ns
-       (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
        (.scan editor ns-regex (fn [match]
                                 (reset! replaced? true)
                                 (.replace match (str namespace))))
        ;;if no (ns ..) replaced; add the header to the file; finally restart repl
        (when-not @replaced?
-         (add-header editor (str namespace)))
-       (reset-repl editor)
-       (atom/success-notify (str "Using " logic-name))) ; TODO detect name of namespace)
-     (atom/error-notify "Logic Workbench not running."))))
-
+         (add-header editor (str namespace))))
+     (throw (js/Error. "Oops!")))))
 
 (defn use-prop []
   (switch-namespace (:prop header) "Propositional Logic"))
@@ -110,22 +111,26 @@
   (reset! started? true)
   (-> (get-editor)
     (.then (fn [editor]
-      (.onDidConnect js/protoRepl
+      (.onDidConnect js/protoRepl ;;FIXME add this only once, not on every toggle on?
         (fn []
-          (reset-repl editor)))
+          (reset-repl editor)
+          (atom/success-notify "Logic Workbench ready!")))
           editor))
     (.then (fn [editor]
       (.toggle js/protoRepl (.getPath repl-project-root))
       editor))
     (.then (fn [editor]
-             (switch-namespace editor (:prop header) "Propositional Logic")
-             (.activatePreviousPane atom/workspace)
-             (atom/success-notify "Logic Workbench ready!")))
+      (when (s/blank? (.getText editor))
+        (switch-namespace editor (:prop header) "Propositional Logic"))
+      (.activatePreviousPane atom/workspace)
+      (atom/set-grammar editor)
+      (atom/info-notify "Logic Workbench starting...")))
     ))
 
 (defn stop-lwb-ui []
   (reset! started? false)
-  (.quitRepl js/protoRepl))
+  (.quitRepl js/protoRepl)
+  (atom/success-notify "Logic Workbench stopped!"))
 
 (defn serialize []
   nil)
