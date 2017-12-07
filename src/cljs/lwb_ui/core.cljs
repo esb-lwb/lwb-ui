@@ -59,7 +59,6 @@
              })
 
 (defn add-header [editor namespace]
-  (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
   (let [buffer (.getBuffer editor)]
     (.insert buffer 0 "\n\n")
     (.insert buffer 0 namespace)))
@@ -76,6 +75,7 @@
    (if @started?
      (let [replaced? (atom false)]
        ;;search for (ns .. ) definitions and replace them with the given ns
+       (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
        (.scan editor ns-regex (fn [match]
                                 (reset! replaced? true)
                                 (.replace match (str namespace))))
@@ -99,11 +99,19 @@
   (.log js/console "Hello World from nd")
   (switch-namespace (:nd header)))
 
+(defn get-editor []
+  (let [replaced? (atom false)
+        editor (.getActiveTextEditor atom/workspace)]
+    (.scan editor ns-regex (fn [match]
+      (reset! replaced? true)))
+    (if (or @replaced? (clojure.string/blank? (.getText editor)))
+      (.resolve js/Promise editor)
+      (.open atom/workspace))))
 
 (defn start-lwb-ui []
   (reset! started? true)
   (->
-    (.open atom/workspace) ;;TODO: function that returns matching editor OR a new ;)
+    (get-editor)
     (.then (fn [editor]
       (.onDidConnect js/protoRepl
         (fn []
