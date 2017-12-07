@@ -26,15 +26,12 @@
 (def pck-root (new atom/directory (.resolvePackagePath atom/packages "lwb-ui")))
 (def repl-project-root (.getSubdirectory pck-root "lwb-proj"))
 
-(defn reset-repl
-  ([]
-    (let [editor (.getActiveTextEditor atom/workspace)]
-      (reset-repl editor)))
-  ([editor]
+(defn reset-repl [editor]
     (let [headLine (.lineTextForBufferRow editor 0)]
       ;FIXME: check if line is (use ...lwb ...)
       (.clearRepl js/protoRepl)
-      (.executeCode js/protoRepl headLine))))
+      (.executeCode js/protoRepl headLine)
+      (atom/success-notify (str "Logic Workbench REPL for ready")))) ; TODO detect name of namespace
 
 (def header {
              :prop '(ns prop
@@ -81,10 +78,12 @@
 
 (defn switch-namespace
   ([namespace]
+   (.log js/console namespace)
    (switch-namespace (get-editor) namespace))
   ([editor namespace]
    (if @started?
      (let [replaced? (atom false)]
+       (.log js/console editor)
        ;;search for (ns .. ) definitions and replace them with the given ns
        (.setGrammar editor (.grammarForScopeName atom/grammars "source.clojure"))
        (.scan editor ns-regex (fn [match]
@@ -98,16 +97,12 @@
 
 
 (defn use-prop []
-  (.log js/console "Hello World from prop")
   (switch-namespace (:prop header)))
 (defn use-pred []
-  (.log js/console "Hello World from pred")
   (switch-namespace (:pred header)))
 (defn use-ltl []
-  (.log js/console "Hello World from ltl")
   (switch-namespace (:ltl header)))
 (defn use-nd []
-  (.log js/console "Hello World from nd")
   (switch-namespace (:nd header)))
 
 (defn start-lwb-ui []
@@ -117,13 +112,13 @@
     (.then (fn [editor]
       (.onDidConnect js/protoRepl
         (fn []
-          (reset-repl editor)
-          (atom/success-notify "Logic Workbench REPL ready")))
+          (reset-repl editor)))
           editor))
     (.then (fn [editor]
       (.toggle js/protoRepl (.getPath repl-project-root))
       editor))
     (.then (fn [editor]
+      (.log js/console editor)
       (switch-namespace editor (:prop header))
       (.activatePreviousPane atom/workspace)))
     ))
