@@ -65,21 +65,22 @@
 ;;matches any namespace of 'header' containing lwb.*
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
+
 (defn get-editor []
+  "Returns a promise of the current active TextEditor that contains our lwb code. If no matching TextEditor is found, create one."
   (if-let [editor (.getActiveTextEditor atom/workspace)]
     (let [replaced? (atom false)]
       (.scan editor ns-regex #(reset! replaced? true))
       (if (or @replaced? (s/blank? (.getText editor)))
         (.resolve js/Promise editor)
         (.open atom/workspace)))
-    (.open atom/workspace)
-    )
-  )
+    (.open atom/workspace)))
 
 (defn switch-namespace
   ([namespace]
    (.log js/console namespace)
-   (switch-namespace (get-editor) namespace))
+   (-> (get-editor)
+       (.then #(switch-namespace %1 namespace))))
   ([editor namespace]
    (if @started?
      (let [replaced? (atom false)]
