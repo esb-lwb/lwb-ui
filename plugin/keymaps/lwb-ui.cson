@@ -9,3 +9,7 @@
 # https://atom.io/docs/latest/behind-atom-keymaps-in-depth
 'atom-workspace':
   'ctrl-alt-o': 'lwb-ui:toggle'
+
+'atom-workspace atom-text-editor:not([mini])':
+  'ctrl-b': 'proto-repl:execute-block'
+  'ctrl-shift-b': 'proto-repl:execute-top-block'
