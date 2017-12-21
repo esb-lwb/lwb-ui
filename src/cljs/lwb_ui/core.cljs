@@ -166,10 +166,10 @@
   "register the commands at atom"
   []
   (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)
-  (.add atom/commands "atom-workspace" "lwb-ui:propositonal-logic" use-prop)    ;;TODO: atom-workspace -> atom editor?
-  (.add atom/commands "atom-workspace" "lwb-ui:predicate-logic" use-pred)
-  (.add atom/commands "atom-workspace" "lwb-ui:linear-temporal-logic" use-ltl)
-  (.add atom/commands "atom-workspace" "lwb-ui:natural-deduction" use-nd)
+  (.add atom/commands "atom-text-editor" "lwb-ui:propositonal-logic" use-prop)
+  (.add atom/commands "atom-text-editor" "lwb-ui:predicate-logic" use-pred)
+  (.add atom/commands "atom-text-editor" "lwb-ui:linear-temporal-logic" use-ltl)
+  (.add atom/commands "atom-text-editor" "lwb-ui:natural-deduction" use-nd)
 )
 
 ;; Dispose all disposables
