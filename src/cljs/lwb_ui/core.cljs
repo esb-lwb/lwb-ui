@@ -52,13 +52,17 @@
 (def ns-regex #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
 
-(defn reset-repl [editor]
+(defn reset-repl
+  "Sets the grammar of the editor to clojure, clears the repl and searches the first lwb requirement and executes it"
+  [editor]
   (atom/set-grammar editor)
   (.scan editor ns-regex (fn [match]
     (.clearRepl js/protoRepl)
     (.executeCode js/protoRepl match.matchText))))
 
-(defn add-header [editor namespace]
+(defn add-header
+  "Adds the given namespace to the given editor"
+  [editor namespace]
   (let [buffer (.getBuffer editor)]
     (.insert buffer 0 "\n\n")
     (.insert buffer 0 namespace)))
@@ -74,6 +78,7 @@
     (.open atom/workspace)))
 
 (defn switch-namespace
+  "Adds or replaces the given namespace to the given or active editor."
   ([namespace logic-name]
    (-> (get-editor)
        (.then (fn [editor]
@@ -98,20 +103,30 @@
          (add-header editor (str namespace))))
      (throw (js/Error. "Oops!")))))
 
-(defn use-prop []
+(defn use-prop
+  "Changes the namespace to \"Propositional Logic\""
+  []
   (switch-namespace (:prop header) "Propositional Logic"))
-(defn use-pred []
+(defn use-pred
+  "Changes the namespace to \"Predicate Logic\""
+  []
   (switch-namespace (:pred header) "Predicate Logic"))
-(defn use-ltl []
+(defn use-ltl
+  "Changes the namespace to \"Linear Temporal Logic\""
+  []
   (switch-namespace (:ltl header) "Linear Temporal Logic"))
-(defn use-nd []
+(defn use-nd
+  "Changes the namespace to \"Natural Deduction\""
+  []
   (switch-namespace (:nd header) "Natural Deduction"))
 
-(defn start-lwb-ui []
+(defn start-lwb-ui
+  "Resets the repl if it's ready. Starts the repl with a default project. Last checks the editor, if it is empty the lwb header for \"Propositional Logic\" will be added."
+  []
   (reset! started? true)
   (-> (get-editor)
     (.then (fn [editor]
-      (.onDidConnect js/protoRepl ;;FIXME add this only once, not on every toggle on?
+      (.onDidConnect js/protoRepl ;;TODO: catch returned "disposable" use it in stop-lwb-ui to dispose this callback
         (fn []
           (reset-repl editor)
           (atom/success-notify "Logic Workbench ready!")))
@@ -127,7 +142,9 @@
       (atom/info-notify "Logic Workbench starting...")))
     ))
 
-(defn stop-lwb-ui []
+(defn stop-lwb-ui
+  "Stops the repl."
+  []
   (reset! started? false)
   (.quitRepl js/protoRepl)
   (atom/success-notify "Logic Workbench stopped!"))
@@ -138,28 +155,33 @@
 (defn install-dependent-packages []
   (.install (node/require "atom-package-deps") "lwb-ui"))
 
-(defn toggle []
-    (.log js/console "lwb-ui was: " @started?)
+(defn toggle
+  "Starts or stops the lwb-ui"
+  []
     (if @started?
       (stop-lwb-ui)
       (start-lwb-ui)))
 
-(defn pck-commands []
+(defn pck-commands
+  "register the commands at atom"
+  []
   (.add atom/commands "atom-workspace" "lwb-ui:toggle" toggle)
-  (.add atom/commands "atom-workspace" "lwb-ui:propositonal-logic" use-prop)
+  (.add atom/commands "atom-workspace" "lwb-ui:propositonal-logic" use-prop)    ;;TODO: atom-workspace -> atom editor?
   (.add atom/commands "atom-workspace" "lwb-ui:predicate-logic" use-pred)
   (.add atom/commands "atom-workspace" "lwb-ui:linear-temporal-logic" use-ltl)
   (.add atom/commands "atom-workspace" "lwb-ui:natural-deduction" use-nd)
 )
 
 ;; Dispose all disposables
-(defn deactivate []
-    (.log js/console "Deactivating lwb-ui...")
+(defn deactivate
+  "runs if the plugin is deactivated or uninstalled"
+  []
     (doseq [disposable @disposables]
       (.dispose disposable)))
 
-(defn activate [state]
-  (.log js/console "Hello World from lwb-ui")
+(defn activate
+  "runs if the plugin is activated or installed"
+  [state]
   (-> (install-dependent-packages)
       (.then #(pck-commands))))
 
