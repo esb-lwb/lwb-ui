@@ -2,10 +2,10 @@
   "name": "lwb-ui",
   "main": "./lib/lwb-ui",
   "version": "0.0.0",
-  "description": "",
-  "keywords": [],
-  "repository": "",
-  "license": "",
+  "description": "User Interface for the 'Logic Workbench (lwb)'",
+  "keywords": ["lwb", "clojure"],
+  "repository": "https://github.com/njustus/lwb-ui.git",
+  "license": "Eclipse Public License",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },

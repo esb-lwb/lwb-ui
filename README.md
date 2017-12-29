@@ -1,6 +1,10 @@
-# lwb-ui
+# Logic Workbench User Interface (lwb-ui)
 
-I am a atom plugin written in clojurescript! Pretty nifty, huh? 😄
+This is a small wrapper around the [Logic Workbench](https://github.com/esb-dev/lwb).
+
+## Usage information
+
+Just execute the *Lwb Ui: Toggle* command from the Command Palette inside of atom.
 
 ## Development
 
@@ -23,7 +27,7 @@ To compile me with a self-compiling loop but without live-reload:
 lein run -m build/dev
 ```
 
-To compile me for release (`:simple` optimizations), use
+To compile for release (`:simple` optimizations), use
 ```
 lein run -m build/release
 ```
