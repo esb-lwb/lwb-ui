@@ -56,7 +56,7 @@
 
 (def ns-regex
   "Regex for matching any value of 'header'."
-  #"\(ns \w+ (?:\(:require (?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
+  #"(?m)^\(ns\s+\w+\s+(?:\(:require\s+(?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
 
 
 (defn reset-repl  [editor]
