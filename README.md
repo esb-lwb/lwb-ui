@@ -6,6 +6,11 @@ This is a small wrapper around the [Logic Workbench](https://github.com/esb-dev/
 
 Just execute the *Lwb Ui: Toggle* command from the Command Palette inside of atom.
 
+## Development Setup
+
+- first clone this repository
+- then initialize the `plugin/` submodule using: `git submodule update -b`
+
 ## Development
 
 If you want to export a function to atom for use with atom commands, make sure to add them to `dev/build.clj` like so:
