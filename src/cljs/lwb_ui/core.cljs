@@ -146,9 +146,8 @@
       (atom/info-notify "Logic Workbench starting...")))
     ))
 
-(defn stop-lwb-ui
+(defn stop-lwb-ui []
   "Stops the repl."
-  []
   (reset! started? false)
   (.quitRepl js/protoRepl)
   (atom/success-notify "Logic Workbench stopped!"))
@@ -162,9 +161,9 @@
 
 (defn toggle []
   "Starts or stops the lwb-ui."
-    (if @started?
-      (stop-lwb-ui)
-      (start-lwb-ui)))
+  (if @started?
+    (stop-lwb-ui)
+    (start-lwb-ui)))
 
 (defn pck-commands []
   "Register the commands at atom.
@@ -173,8 +172,7 @@
   (.add atom/commands "atom-text-editor" "lwb-ui:propositonal-logic" use-prop)
   (.add atom/commands "atom-text-editor" "lwb-ui:predicate-logic" use-pred)
   (.add atom/commands "atom-text-editor" "lwb-ui:linear-temporal-logic" use-ltl)
-  (.add atom/commands "atom-text-editor" "lwb-ui:natural-deduction" use-nd)
-)
+  (.add atom/commands "atom-text-editor" "lwb-ui:natural-deduction" use-nd))
 
 ;; Dispose all disposables
 (defn deactivate []
@@ -185,7 +183,13 @@
 (defn activate [state]
   "Executed ones to activate this package."
   (-> (install-dependent-packages)
-      (.then #(pck-commands))))
+      (.then (fn []
+        (pck-commands)))
+      (.then (fn []
+        (.log js/console "promise... " state)
+        (if (not @started?)
+        (start-lwb-ui))))
+    ))
 
 ;; live-reload
 ;; calls stop before hotswapping code
