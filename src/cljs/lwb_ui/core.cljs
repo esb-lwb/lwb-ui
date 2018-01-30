@@ -1,5 +1,6 @@
 (ns lwb-ui.core
   (:require [cljs.nodejs :as node]
+            [cljs.pprint :as pprint]
             [lwb-ui.atom :as atom]
             [clojure.string :as s]))
 
@@ -54,6 +55,11 @@
                       (:require [lwb.nd.repl :refer :all]))
              })
 
+(defn- prettify-code [code]
+  (pprint/write code :stream nil :readably))
+
+
+
 (def ns-regex
   "Regex for matching any value of 'header'."
   #"(?m)^\(ns\s+\w+\s+(?:\(:require\s+(?:\[lwb\.[\w\.]+[^\]]*\]\s*)+\)\s*)+\)")
@@ -103,10 +109,10 @@
        ;;search for (ns .. ) definitions and replace them with the given ns
        (.scan editor ns-regex (fn [match]
                                 (reset! replaced? true)
-                                (.replace match (str namespace))))
+                                (.replace match (prettify-code namespace))))
        ;;if no (ns ..) replaced; add the header to the file; finally restart repl
        (when-not @replaced?
-         (add-header editor (str namespace))))
+         (add-header editor (prettify-code namespace))))
      (throw (js/Error. "Oops!")))))
 
 (defn use-prop []
