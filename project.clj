@@ -1,6 +1,6 @@
 (defproject lwb-ui "0.1.0"
   :description "User Interface for the 'Logic Workbench (lwb)'"
-  :url "https://github.com/njustus/lwb-ui"
+  :url "https://github.com/esb-lwb/lwb-ui"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 

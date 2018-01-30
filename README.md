@@ -9,7 +9,7 @@ Just execute the *Lwb Ui: Toggle* command from the Command Palette inside of ato
 ## Development Setup
 
 - first clone this repository
-- then initialize the `plugin/` submodule using: `git submodule update -b`
+- then initialize the `plugin/` submodule using: `git submodule init` `git submodule update`
 
 ## Development
 
