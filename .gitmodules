@@ -1,3 +1,4 @@
 [submodule "plugin"]
 	path = plugin
 	url = ../lwb-ui-bin.git
+	branch = master
