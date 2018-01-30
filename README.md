@@ -1,6 +1,6 @@
 # Logic Workbench User Interface (lwb-ui)
 
-This is a small wrapper around the [Logic Workbench](https://github.com/esb-dev/lwb).
+This is a small wrapper around the [Logic Workbench](https://github.com/esb-lwb/lwb).
 
 ## Usage information
 
@@ -37,7 +37,8 @@ To compile for release (`:simple` optimizations), use
 lein run -m build/release
 ```
 
-After you have done that, go into the `plugin/` folder and run
+After you have done that, go into the `plugin/` folder and run for a local installation
+in atom
 ```
 apm install
 apm link
