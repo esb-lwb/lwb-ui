@@ -7,7 +7,9 @@
 (defn- plugin-setup []
   (-> (cljs/init-state)
       (cljs/set-build-options
-          {:node-global-prefix "global.lwb_ui"})
+       {:node-global-prefix "global.lwb_ui"
+        :language-in :ecmascript6
+        :language-out :ecmascript5})
       (cljs/find-resources-in-classpath)
       (umd/create-module
         {:activate 'lwb-ui.core/activate
