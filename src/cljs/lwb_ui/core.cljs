@@ -35,22 +35,20 @@
   {
              :prop '(ns prop
                       (:require [lwb.prop :refer :all]
-                                [lwb.prop.cardinality :as lc]
-                                [lwb.prop.bdd :as bdd]
-                                ;; [lwb.prop.vis :as lv]
-                                [lwb.prop.nf :as nf]
-                                [lwb.prop.sat :as sat]))
+                                [lwb.prop.nf :refer [literal? nnf cnf cnf? dnf dnf?]]
+                                [lwb.prop.sat :refer [tseitin sat sat? valid?]]
+                                [lwb.prop.cardinality :refer [min-kof max-kof kof oneof]]
+                                [lwb.prop.bdd :as bdd]))
              :pred '(ns pred
                       (:require [lwb.pred :refer :all]
-                                [lwb.pred.sat :as sat]
-                                [lwb.pred.kic :as kic]
-                                [lwb.pred.substitution :as lsub]))
+                                [lwb.pred.sat :refer [sat sat? valid?]]
+                                [lwb.pred.substitution :refer [freefor? substitution]]))
              :ltl  '(ns ltl
                       (:require [lwb.ltl :refer :all]
-                                [lwb.ltl.eval :as le]
-                                [lwb.ltl.buechi :as lb]
-                                [lwb.ltl.kripke :as lk]
-                                [lwb.ltl.sat :as sat]))
+                                [lwb.ltl.eval :refer [eval-phi]]
+                                [lwb.ltl.buechi :refer [ba ks->ba]]
+                                [lwb.ltl.sat :refer [sat sat? valid?]]
+                                [lwb.ltl.kripke :as kripke]))
              :nd   '(ns nd
                       (:require [lwb.nd.repl :refer :all]))
              })
