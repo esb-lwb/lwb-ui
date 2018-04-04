@@ -2,3 +2,6 @@
 	path = plugin
 	url = ../lwb-ui-bin.git
 	branch = master
+[submodule "wiki"]
+	path = wiki
+	url = https://github.com/esb-lwb/lwb-ui.wiki
