@@ -45,3 +45,5 @@ apm link
 ```
 
 lwb-ui should now be installed inside atom!
+
+More about lwb-ui [Documentation](https://github.com/esb-lwb/lwb-ui/wiki)
