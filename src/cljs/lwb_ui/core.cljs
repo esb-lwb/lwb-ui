@@ -51,6 +51,9 @@
                                 [lwb.ltl.kripke :as kripke]))
              :nd   '(ns nd
                       (:require [lwb.nd.repl :refer :all]))
+             :cl   '(ns cl
+                      (:require [lwb.cl :refer :all]
+                                [lwb.cl.repl :refer :all]))
              })
 
 (defn- prettify-code [code]
@@ -125,6 +128,9 @@
 (defn use-nd []
   "Changes the namespace (therefore logic) to 'Natural Deduction'."
   (switch-namespace (:nd header) "Natural Deduction"))
+(defn use-cl []
+  "Changes the namespace (therefore logic) to 'Combinatory Logic'."
+  (switch-namespace (:cl header) "Combinatory LoLic"))
 
 (defn start-lwb-ui []
   "Starts the lwb-ui by doing the following:
@@ -176,7 +182,8 @@
   (.add atom/commands "atom-text-editor" "lwb-ui:propositonal-logic" use-prop)
   (.add atom/commands "atom-text-editor" "lwb-ui:predicate-logic" use-pred)
   (.add atom/commands "atom-text-editor" "lwb-ui:linear-temporal-logic" use-ltl)
-  (.add atom/commands "atom-text-editor" "lwb-ui:natural-deduction" use-nd))
+  (.add atom/commands "atom-text-editor" "lwb-ui:natural-deduction" use-nd)
+  (.add atom/commands "atom-text-editor" "lwb-ui:combinatory-logic" use-cl))
 
 ;; Dispose all disposables
 (defn deactivate []
