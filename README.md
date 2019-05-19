@@ -10,6 +10,7 @@ Just execute the *Lwb Ui: Toggle* command from the Command Palette inside of ato
 
 - first clone this repository
 - then initialize the `plugin/` submodule using: `git submodule init` `git submodule update`
+- install the dependencies: `npm install`
 
 ## Compiling and running
 
