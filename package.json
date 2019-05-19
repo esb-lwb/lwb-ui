@@ -1,0 +1,19 @@
+{
+  "name": "lwb-ui",
+  "version": "1.0.0",
+  "description": "This is a small wrapper around the [Logic Workbench](https://github.com/esb-lwb/lwb).",
+  "main": "",
+  "dependencies": {
+    "shadow-cljs": "^2.8.37"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esb-lwb/lwb-ui.git"
+  },
+  "keywords": [],
+  "author": ""
+}
