@@ -1,3 +1,13 @@
+# Info about the status of Logic Workbench User Interface (lwb-ui)
+
+The project is not longer maintained. I recommend the [Logic Workbench GUI lwb-gui](https://github.com/esb-lwb/lwb-gui) as a simple graphical user interface to the [Logic Workbench](https://github.com/esb-lwb/lwb).
+
+lwb-ui uses proto-repl and ink als plugins in the atom editor. Unfortunately it seems that proto-repl is not maintaindes anymore. The current version of proto-repl doesn't work with the newest version of ink.
+
+That's the reason, why this project is deprecated.
+
+-- 2020-01-15
+
 # Logic Workbench User Interface (lwb-ui)
 
 This is a small wrapper around the [Logic Workbench](https://github.com/esb-lwb/lwb).
